@@ -11,6 +11,7 @@ import '@fortawesome/fontawesome-free/css/all.css';
 function App() {
   const [currentPage, setCurrentPage] = useState('staff');
   const [staffData, setStaffData] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
   const [logoError, setLogoError] = useState(false);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
@@ -22,16 +23,20 @@ function App() {
       fetchStaff();
     } else {
       setCurrentPage('login');
+      setIsLoading(false);
     }
   }, []);
 
   const fetchStaff = async () => {
+    setIsLoading(true);
     try {
       const response = await axios.get('http://localhost:5000/api/staff');
       setStaffData(response.data);
     } catch (error) {
       console.error('Error fetching staff:', error);
       toast.error('Failed to fetch staff data');
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -47,10 +52,12 @@ function App() {
     localStorage.removeItem('isAuthenticated');
     setIsAuthenticated(false);
     setCurrentPage('login');
+    setStaffData([]);
     toast.info('Logged out successfully');
   };
 
   const handleLogin = () => {
+    localStorage.setItem('isAuthenticated', 'true');
     setIsAuthenticated(true);
     setCurrentPage('staff');
     fetchStaff();
@@ -70,9 +77,23 @@ function App() {
           toast.success('Staff member added successfully!');
         }} />;
       case 'staff':
-        return <StaffList onAddStaff={handleAddStaff} />;
+        return (
+          <StaffList 
+            onAddStaff={handleAddStaff} 
+            staffData={staffData}
+            onStaffUpdate={fetchStaff}
+            isLoading={isLoading}
+          />
+        );
       default:
-        return <StaffList onAddStaff={handleAddStaff} />;
+        return (
+          <StaffList 
+            onAddStaff={handleAddStaff} 
+            staffData={staffData}
+            onStaffUpdate={fetchStaff}
+            isLoading={isLoading}
+          />
+        );
     }
   };
 
@@ -123,24 +144,24 @@ function App() {
             <div className="d-flex align-items-center">
               <ul className="navbar-nav me-auto">
                 <li className="nav-item">
-                  <a 
-                    className={`nav-link ${currentPage === 'addStaff' ? 'active' : ''}`} 
-                    href="#" 
+                  <button 
+                    className={`nav-link btn btn-link ${currentPage === 'addStaff' ? 'active' : ''}`} 
                     onClick={() => setCurrentPage('addStaff')}
+                    style={{ textDecoration: 'none' }}
                   >
                     <i className="fas fa-user-plus me-2"></i>
                     Add Staff
-                  </a>
+                  </button>
                 </li>
                 <li className="nav-item">
-                  <a 
-                    className={`nav-link ${currentPage === 'staff' ? 'active' : ''}`} 
-                    href="#" 
+                  <button 
+                    className={`nav-link btn btn-link ${currentPage === 'staff' ? 'active' : ''}`} 
                     onClick={() => setCurrentPage('staff')}
+                    style={{ textDecoration: 'none' }}
                   >
                     <i className="fas fa-users me-2"></i>
                     Staff
-                  </a>
+                  </button>
                 </li>
               </ul>
               <button 

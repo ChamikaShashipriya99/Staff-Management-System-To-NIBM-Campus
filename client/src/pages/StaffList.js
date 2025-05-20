@@ -1,12 +1,11 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import axios from 'axios';
 import { toast } from 'react-toastify';
 import * as XLSX from 'xlsx';
 import { jsPDF } from 'jspdf';
 import autoTable from 'jspdf-autotable';
 
-const StaffList = ({ onAddStaff }) => {
-  const [staffData, setStaffData] = useState([]);
+const StaffList = ({ onAddStaff, staffData, onStaffUpdate, isLoading }) => {
   const [showEditModal, setShowEditModal] = useState(false);
   const [selectedStaff, setSelectedStaff] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
@@ -35,25 +34,11 @@ const StaffList = ({ onAddStaff }) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showDownloadMenu, setShowDownloadMenu] = useState(false);
 
-  useEffect(() => {
-    fetchStaff();
-  }, []);
-
-  const fetchStaff = async () => {
-    try {
-      const response = await axios.get('http://localhost:5000/api/staff');
-      setStaffData(response.data);
-    } catch (error) {
-      console.error('Error fetching staff:', error);
-      toast.error('Failed to fetch staff data');
-    }
-  };
-
   const handleDelete = async (staffId) => {
     if (window.confirm('Are you sure you want to delete this staff member?')) {
       try {
         await axios.delete(`http://localhost:5000/api/staff/${staffId}`);
-        await fetchStaff();
+        onStaffUpdate(); // Call the parent's update function
         toast.success('Staff member deleted successfully');
       } catch (error) {
         console.error('Error deleting staff:', error);
@@ -93,7 +78,6 @@ const StaffList = ({ onAddStaff }) => {
     e.preventDefault();
     setIsSubmitting(true);
     try {
-      // Ensure academicActivities has the correct structure before sending
       const updatedData = {
         ...editForm,
         academicActivities: Object.entries(editForm.academicActivities).reduce((acc, [day, activities]) => {
@@ -114,7 +98,7 @@ const StaffList = ({ onAddStaff }) => {
 
       await axios.put(`http://localhost:5000/api/staff/${selectedStaff._id}`, updatedData);
       setShowEditModal(false);
-      await fetchStaff();
+      onStaffUpdate(); // Call the parent's update function
       toast.success('Staff member updated successfully');
     } catch (error) {
       console.error('Error updating staff:', error);
@@ -507,6 +491,7 @@ const StaffList = ({ onAddStaff }) => {
             <button 
               className="btn btn-outline-primary d-flex align-items-center"
               onClick={() => setShowDownloadMenu(!showDownloadMenu)}
+              disabled={isLoading || staffData.length === 0}
               style={{ 
                 borderRadius: '12px',
                 padding: '0.6rem 1.2rem',
@@ -516,8 +501,10 @@ const StaffList = ({ onAddStaff }) => {
                 background: 'rgba(13, 110, 253, 0.02)'
               }}
               onMouseEnter={(e) => {
-                e.currentTarget.style.transform = 'translateY(-2px)';
-                e.currentTarget.style.boxShadow = '0 4px 12px rgba(0,0,0,0.1)';
+                if (!isLoading && staffData.length > 0) {
+                  e.currentTarget.style.transform = 'translateY(-2px)';
+                  e.currentTarget.style.boxShadow = '0 4px 12px rgba(0,0,0,0.1)';
+                }
               }}
               onMouseLeave={(e) => {
                 e.currentTarget.style.transform = 'translateY(0)';
@@ -648,6 +635,7 @@ const StaffList = ({ onAddStaff }) => {
                   placeholder="Search staff members..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
+                  disabled={isLoading}
                   style={{ 
                     fontSize: '1rem',
                     padding: '0.75rem 1.25rem',
@@ -672,6 +660,7 @@ const StaffList = ({ onAddStaff }) => {
                     className="form-select form-select-lg border-0"
                     value={sortField}
                     onChange={(e) => handleSort(e.target.value)}
+                    disabled={isLoading}
                     style={{
                       boxShadow: '0 2px 10px rgba(0,0,0,0.05)',
                       borderRadius: '15px',
@@ -689,6 +678,7 @@ const StaffList = ({ onAddStaff }) => {
                 <button
                   className="btn btn-lg btn-outline-primary border-0"
                   onClick={() => setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc')}
+                  disabled={isLoading}
                   style={{
                     boxShadow: '0 2px 10px rgba(0,0,0,0.05)',
                     borderRadius: '15px',
@@ -714,7 +704,14 @@ const StaffList = ({ onAddStaff }) => {
       </div>
 
       <div className="row">
-        {filteredAndSortedStaff.length > 0 ? (
+        {isLoading ? (
+          <div className="col-12 text-center py-5">
+            <div className="spinner-border text-primary" role="status">
+              <span className="visually-hidden">Loading...</span>
+            </div>
+            <p className="mt-3 text-muted">Loading staff data...</p>
+          </div>
+        ) : filteredAndSortedStaff.length > 0 ? (
           filteredAndSortedStaff.map(staff => renderStaffCard(staff))
         ) : (
           <div className="col-12">
