@@ -6,6 +6,9 @@ const StaffList = ({ onAddStaff }) => {
   const [staffData, setStaffData] = useState([]);
   const [showEditModal, setShowEditModal] = useState(false);
   const [selectedStaff, setSelectedStaff] = useState(null);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [sortField, setSortField] = useState('name');
+  const [sortDirection, setSortDirection] = useState('asc');
   const [editForm, setEditForm] = useState({
     name: '',
     position: '',
@@ -391,6 +394,35 @@ const StaffList = ({ onAddStaff }) => {
     );
   };
 
+  const filteredAndSortedStaff = staffData
+    .filter(staff => {
+      const searchLower = searchTerm.toLowerCase();
+      return (
+        staff.name.toLowerCase().includes(searchLower) ||
+        staff.position.toLowerCase().includes(searchLower) ||
+        staff.department.toLowerCase().includes(searchLower) ||
+        staff.email.toLowerCase().includes(searchLower)
+      );
+    })
+    .sort((a, b) => {
+      let comparison = 0;
+      if (sortField === 'joinDate') {
+        comparison = new Date(a[sortField]) - new Date(b[sortField]);
+      } else {
+        comparison = a[sortField].localeCompare(b[sortField]);
+      }
+      return sortDirection === 'asc' ? comparison : -comparison;
+    });
+
+  const handleSort = (field) => {
+    if (field === sortField) {
+      setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc');
+    } else {
+      setSortField(field);
+      setSortDirection('asc');
+    }
+  };
+
   return (
     <div className="mt-4">
       <div className="d-flex justify-content-between align-items-center mb-4">
@@ -407,8 +439,130 @@ const StaffList = ({ onAddStaff }) => {
         </button>
       </div>
 
+      {/* Search and Sort Controls */}
+      <div className="card border-0 shadow-sm mb-4" style={{ 
+        borderRadius: '20px',
+        background: 'linear-gradient(to right, #ffffff, #f8f9fa)',
+        backdropFilter: 'blur(10px)'
+      }}>
+        <div className="card-body p-4">
+          <div className="row g-4">
+            <div className="col-md-6">
+              <div className="input-group input-group-lg" style={{
+                boxShadow: '0 2px 10px rgba(0,0,0,0.05)',
+                borderRadius: '15px',
+                overflow: 'hidden'
+              }}>
+                <span className="input-group-text bg-white border-0" style={{ padding: '0.75rem 1.25rem' }}>
+                  <i className="fas fa-search text-primary"></i>
+                </span>
+                <input
+                  type="text"
+                  className="form-control border-0 ps-0"
+                  placeholder="Search staff members..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  style={{ 
+                    fontSize: '1rem',
+                    padding: '0.75rem 1.25rem',
+                    background: 'transparent'
+                  }}
+                />
+                {searchTerm && (
+                  <button
+                    className="btn btn-link text-muted border-0"
+                    onClick={() => setSearchTerm('')}
+                    style={{ padding: '0.75rem 1.25rem' }}
+                  >
+                    <i className="fas fa-times"></i>
+                  </button>
+                )}
+              </div>
+            </div>
+            <div className="col-md-6">
+              <div className="d-flex gap-3">
+                <div className="flex-grow-1">
+                  <select
+                    className="form-select form-select-lg border-0"
+                    value={sortField}
+                    onChange={(e) => handleSort(e.target.value)}
+                    style={{
+                      boxShadow: '0 2px 10px rgba(0,0,0,0.05)',
+                      borderRadius: '15px',
+                      padding: '0.75rem 1.25rem',
+                      fontSize: '1rem',
+                      background: 'white'
+                    }}
+                  >
+                    <option value="name">Sort by Name</option>
+                    <option value="position">Sort by Position</option>
+                    <option value="department">Sort by Department</option>
+                    <option value="joinDate">Sort by Join Date</option>
+                  </select>
+                </div>
+                <button
+                  className="btn btn-lg btn-outline-primary border-0"
+                  onClick={() => setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc')}
+                  style={{
+                    boxShadow: '0 2px 10px rgba(0,0,0,0.05)',
+                    borderRadius: '15px',
+                    padding: '0.75rem 1.25rem',
+                    background: 'white',
+                    transition: 'all 0.3s ease'
+                  }}
+                >
+                  <i className={`fas fa-sort-${sortDirection === 'asc' ? 'up' : 'down'}`}></i>
+                </button>
+              </div>
+            </div>
+          </div>
+          {searchTerm && (
+            <div className="mt-3 text-muted">
+              <small>
+                <i className="fas fa-info-circle me-1"></i>
+                Showing results for "{searchTerm}"
+              </small>
+            </div>
+          )}
+        </div>
+      </div>
+
       <div className="row">
-        {staffData.map(staff => renderStaffCard(staff))}
+        {filteredAndSortedStaff.length > 0 ? (
+          filteredAndSortedStaff.map(staff => renderStaffCard(staff))
+        ) : (
+          <div className="col-12">
+            <div className="card border-0 shadow-sm text-center p-5" style={{ 
+              borderRadius: '20px',
+              background: 'linear-gradient(to right, #ffffff, #f8f9fa)'
+            }}>
+              <div className="mb-4">
+                <i className="fas fa-search fa-3x text-muted mb-3"></i>
+                <h4 className="text-muted mb-2">No Staff Members Found</h4>
+                <p className="text-muted mb-0">
+                  {searchTerm ? (
+                    <>
+                      No staff members match your search for "<strong>{searchTerm}</strong>".<br />
+                      Try different keywords or clear the search to see all staff members.
+                    </>
+                  ) : (
+                    "There are no staff members in the system yet."
+                  )}
+                </p>
+              </div>
+              {searchTerm && (
+                <button
+                  className="btn btn-outline-primary"
+                  onClick={() => setSearchTerm('')}
+                  style={{ borderRadius: '10px' }}
+                >
+                  <i className="fas fa-times me-2"></i>
+                  Clear Search
+                </button>
+              )}
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Edit Modal */}
