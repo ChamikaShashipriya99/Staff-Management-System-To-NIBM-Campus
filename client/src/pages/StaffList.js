@@ -428,19 +428,34 @@ const StaffList = ({ onAddStaff }) => {
   };
 
   const downloadCSV = () => {
-    const headers = ['Name', 'Position', 'Email', 'Phone', 'Department', 'Join Date'];
-    const csvData = filteredAndSortedStaff.map(staff => [
-      staff.name,
-      staff.position,
-      staff.email,
-      staff.phone,
-      staff.department,
-      new Date(staff.joinDate).toLocaleDateString()
-    ]);
+    const headers = [
+      'Name', 'Position', 'Email', 'Phone', 'Department', 'Join Date',
+      'Monday Schedule', 'Tuesday Schedule', 'Wednesday Schedule',
+      'Thursday Schedule', 'Friday Schedule', 'Saturday Schedule', 'Sunday Schedule'
+    ];
+
+    const csvData = filteredAndSortedStaff.map(staff => {
+      const scheduleText = Object.entries(staff.academicActivities || {}).map(([day, activities]) => {
+        if (!Array.isArray(activities) || activities.length === 0) return 'No activities';
+        return activities.map(activity => 
+          `${activity.startTime}-${activity.endTime} (${activity.lectureHall})`
+        ).join('; ');
+      });
+
+      return [
+        staff.name,
+        staff.position,
+        staff.email,
+        staff.phone,
+        staff.department,
+        new Date(staff.joinDate).toLocaleDateString(),
+        ...scheduleText
+      ];
+    });
 
     const csvContent = [
       headers.join(','),
-      ...csvData.map(row => row.join(','))
+      ...csvData.map(row => row.map(cell => `"${cell}"`).join(','))
     ].join('\n');
 
     const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
@@ -451,52 +466,33 @@ const StaffList = ({ onAddStaff }) => {
   };
 
   const downloadExcel = () => {
-    const worksheet = XLSX.utils.json_to_sheet(
-      filteredAndSortedStaff.map(staff => ({
+    const staffData = filteredAndSortedStaff.map(staff => {
+      const scheduleData = {};
+      Object.entries(staff.academicActivities || {}).forEach(([day, activities]) => {
+        if (Array.isArray(activities) && activities.length > 0) {
+          scheduleData[`${day} Schedule`] = activities.map(activity => 
+            `${activity.startTime}-${activity.endTime} (${activity.lectureHall})`
+          ).join('; ');
+        } else {
+          scheduleData[`${day} Schedule`] = 'No activities';
+        }
+      });
+
+      return {
         Name: staff.name,
         Position: staff.position,
         Email: staff.email,
         Phone: staff.phone,
         Department: staff.department,
-        'Join Date': new Date(staff.joinDate).toLocaleDateString()
-      }))
-    );
+        'Join Date': new Date(staff.joinDate).toLocaleDateString(),
+        ...scheduleData
+      };
+    });
+
+    const worksheet = XLSX.utils.json_to_sheet(staffData);
     const workbook = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(workbook, worksheet, 'Staff List');
     XLSX.writeFile(workbook, `staff_list_${new Date().toISOString().split('T')[0]}.xlsx`);
-  };
-
-  const downloadPDF = () => {
-    const doc = new jsPDF();
-    
-    // Add title
-    doc.setFontSize(16);
-    doc.text('Staff List', 14, 15);
-    
-    // Add date
-    doc.setFontSize(10);
-    doc.text(`Generated on: ${new Date().toLocaleDateString()}`, 14, 22);
-
-    // Add table
-    const tableColumn = ['Name', 'Position', 'Email', 'Phone', 'Department', 'Join Date'];
-    const tableRows = filteredAndSortedStaff.map(staff => [
-      staff.name,
-      staff.position,
-      staff.email,
-      staff.phone,
-      staff.department,
-      new Date(staff.joinDate).toLocaleDateString()
-    ]);
-
-    autoTable(doc, {
-      head: [tableColumn],
-      body: tableRows,
-      startY: 30,
-      styles: { fontSize: 8 },
-      headStyles: { fillColor: [41, 128, 185] }
-    });
-
-    doc.save(`staff_list_${new Date().toISOString().split('T')[0]}.pdf`);
   };
 
   return (
@@ -550,31 +546,6 @@ const StaffList = ({ onAddStaff }) => {
                     <div className="px-2 py-1 mb-1">
                       <small className="text-muted">Export Format</small>
                     </div>
-                    <button
-                      className="btn btn-link text-dark w-100 text-start p-2 d-flex align-items-center"
-                      onClick={() => {
-                        downloadPDF();
-                        setShowDownloadMenu(false);
-                      }}
-                      style={{ 
-                        borderRadius: '10px',
-                        transition: 'all 0.2s ease'
-                      }}
-                      onMouseEnter={(e) => {
-                        e.currentTarget.style.background = 'rgba(220, 53, 69, 0.1)';
-                      }}
-                      onMouseLeave={(e) => {
-                        e.currentTarget.style.background = 'transparent';
-                      }}
-                    >
-                      <div className="bg-danger bg-opacity-10 rounded-circle p-2 me-2">
-                        <i className="fas fa-file-pdf text-danger"></i>
-                      </div>
-                      <div>
-                        <div>Download PDF</div>
-                        <small className="text-muted">Portable Document Format</small>
-                      </div>
-                    </button>
                     <button
                       className="btn btn-link text-dark w-100 text-start p-2 d-flex align-items-center"
                       onClick={() => {
