@@ -1,6 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { toast } from 'react-toastify';
+import * as XLSX from 'xlsx';
+import { jsPDF } from 'jspdf';
+import autoTable from 'jspdf-autotable';
 
 const StaffList = ({ onAddStaff }) => {
   const [staffData, setStaffData] = useState([]);
@@ -30,6 +33,7 @@ const StaffList = ({ onAddStaff }) => {
   const [selectedFile, setSelectedFile] = useState(null);
   const [previewUrl, setPreviewUrl] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showDownloadMenu, setShowDownloadMenu] = useState(false);
 
   useEffect(() => {
     fetchStaff();
@@ -423,6 +427,78 @@ const StaffList = ({ onAddStaff }) => {
     }
   };
 
+  const downloadCSV = () => {
+    const headers = ['Name', 'Position', 'Email', 'Phone', 'Department', 'Join Date'];
+    const csvData = filteredAndSortedStaff.map(staff => [
+      staff.name,
+      staff.position,
+      staff.email,
+      staff.phone,
+      staff.department,
+      new Date(staff.joinDate).toLocaleDateString()
+    ]);
+
+    const csvContent = [
+      headers.join(','),
+      ...csvData.map(row => row.join(','))
+    ].join('\n');
+
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = `staff_list_${new Date().toISOString().split('T')[0]}.csv`;
+    link.click();
+  };
+
+  const downloadExcel = () => {
+    const worksheet = XLSX.utils.json_to_sheet(
+      filteredAndSortedStaff.map(staff => ({
+        Name: staff.name,
+        Position: staff.position,
+        Email: staff.email,
+        Phone: staff.phone,
+        Department: staff.department,
+        'Join Date': new Date(staff.joinDate).toLocaleDateString()
+      }))
+    );
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, 'Staff List');
+    XLSX.writeFile(workbook, `staff_list_${new Date().toISOString().split('T')[0]}.xlsx`);
+  };
+
+  const downloadPDF = () => {
+    const doc = new jsPDF();
+    
+    // Add title
+    doc.setFontSize(16);
+    doc.text('Staff List', 14, 15);
+    
+    // Add date
+    doc.setFontSize(10);
+    doc.text(`Generated on: ${new Date().toLocaleDateString()}`, 14, 22);
+
+    // Add table
+    const tableColumn = ['Name', 'Position', 'Email', 'Phone', 'Department', 'Join Date'];
+    const tableRows = filteredAndSortedStaff.map(staff => [
+      staff.name,
+      staff.position,
+      staff.email,
+      staff.phone,
+      staff.department,
+      new Date(staff.joinDate).toLocaleDateString()
+    ]);
+
+    autoTable(doc, {
+      head: [tableColumn],
+      body: tableRows,
+      startY: 30,
+      styles: { fontSize: 8 },
+      headStyles: { fillColor: [41, 128, 185] }
+    });
+
+    doc.save(`staff_list_${new Date().toISOString().split('T')[0]}.pdf`);
+  };
+
   return (
     <div className="mt-4">
       <div className="d-flex justify-content-between align-items-center mb-4">
@@ -430,13 +506,152 @@ const StaffList = ({ onAddStaff }) => {
           <i className="fas fa-users me-2"></i>
           Staff List
         </h3>
-        <button 
-          className="btn btn-primary"
-          onClick={onAddStaff}
-        >
-          <i className="fas fa-plus me-2"></i>
-          Add New Staff
-        </button>
+        <div className="d-flex gap-3">
+          <div className="position-relative">
+            <button 
+              className="btn btn-outline-primary d-flex align-items-center"
+              onClick={() => setShowDownloadMenu(!showDownloadMenu)}
+              style={{ 
+                borderRadius: '12px',
+                padding: '0.6rem 1.2rem',
+                transition: 'all 0.3s ease',
+                boxShadow: '0 2px 8px rgba(0,0,0,0.05)',
+                border: '1px solid rgba(13, 110, 253, 0.2)',
+                background: 'rgba(13, 110, 253, 0.02)'
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.transform = 'translateY(-2px)';
+                e.currentTarget.style.boxShadow = '0 4px 12px rgba(0,0,0,0.1)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.transform = 'translateY(0)';
+                e.currentTarget.style.boxShadow = '0 2px 8px rgba(0,0,0,0.05)';
+              }}
+            >
+              <i className="fas fa-download me-2"></i>
+              Download
+              <i className={`fas fa-chevron-${showDownloadMenu ? 'up' : 'down'} ms-2`} style={{ fontSize: '0.8rem' }}></i>
+            </button>
+            {showDownloadMenu && (
+              <div 
+                className="position-absolute end-0 mt-2 animate__animated animate__fadeIn"
+                style={{ 
+                  zIndex: 1000,
+                  animation: 'fadeIn 0.2s ease-in-out'
+                }}
+              >
+                <div className="card border-0 shadow-lg" style={{ 
+                  borderRadius: '15px',
+                  minWidth: '220px',
+                  background: 'rgba(255, 255, 255, 0.98)',
+                  backdropFilter: 'blur(10px)'
+                }}>
+                  <div className="card-body p-2">
+                    <div className="px-2 py-1 mb-1">
+                      <small className="text-muted">Export Format</small>
+                    </div>
+                    <button
+                      className="btn btn-link text-dark w-100 text-start p-2 d-flex align-items-center"
+                      onClick={() => {
+                        downloadPDF();
+                        setShowDownloadMenu(false);
+                      }}
+                      style={{ 
+                        borderRadius: '10px',
+                        transition: 'all 0.2s ease'
+                      }}
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.background = 'rgba(220, 53, 69, 0.1)';
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.background = 'transparent';
+                      }}
+                    >
+                      <div className="bg-danger bg-opacity-10 rounded-circle p-2 me-2">
+                        <i className="fas fa-file-pdf text-danger"></i>
+                      </div>
+                      <div>
+                        <div>Download PDF</div>
+                        <small className="text-muted">Portable Document Format</small>
+                      </div>
+                    </button>
+                    <button
+                      className="btn btn-link text-dark w-100 text-start p-2 d-flex align-items-center"
+                      onClick={() => {
+                        downloadExcel();
+                        setShowDownloadMenu(false);
+                      }}
+                      style={{ 
+                        borderRadius: '10px',
+                        transition: 'all 0.2s ease'
+                      }}
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.background = 'rgba(25, 135, 84, 0.1)';
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.background = 'transparent';
+                      }}
+                    >
+                      <div className="bg-success bg-opacity-10 rounded-circle p-2 me-2">
+                        <i className="fas fa-file-excel text-success"></i>
+                      </div>
+                      <div>
+                        <div>Download Excel</div>
+                        <small className="text-muted">Spreadsheet Format</small>
+                      </div>
+                    </button>
+                    <button
+                      className="btn btn-link text-dark w-100 text-start p-2 d-flex align-items-center"
+                      onClick={() => {
+                        downloadCSV();
+                        setShowDownloadMenu(false);
+                      }}
+                      style={{ 
+                        borderRadius: '10px',
+                        transition: 'all 0.2s ease'
+                      }}
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.background = 'rgba(13, 110, 253, 0.1)';
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.background = 'transparent';
+                      }}
+                    >
+                      <div className="bg-primary bg-opacity-10 rounded-circle p-2 me-2">
+                        <i className="fas fa-file-csv text-primary"></i>
+                      </div>
+                      <div>
+                        <div>Download CSV</div>
+                        <small className="text-muted">Comma Separated Values</small>
+                      </div>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+          <button 
+            className="btn btn-primary d-flex align-items-center"
+            onClick={onAddStaff}
+            style={{ 
+              borderRadius: '12px',
+              padding: '0.6rem 1.2rem',
+              transition: 'all 0.3s ease',
+              boxShadow: '0 2px 8px rgba(0,0,0,0.1)'
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.transform = 'translateY(-2px)';
+              e.currentTarget.style.boxShadow = '0 4px 12px rgba(0,0,0,0.15)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.transform = 'translateY(0)';
+              e.currentTarget.style.boxShadow = '0 2px 8px rgba(0,0,0,0.1)';
+            }}
+          >
+            <i className="fas fa-plus me-2"></i>
+            Add New Staff
+          </button>
+        </div>
       </div>
 
       {/* Search and Sort Controls */}
