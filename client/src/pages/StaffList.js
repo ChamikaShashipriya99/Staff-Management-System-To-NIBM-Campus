@@ -3,7 +3,7 @@ import axios from 'axios';
 import { toast } from 'react-toastify';
 import * as XLSX from 'xlsx';
 import { jsPDF } from 'jspdf';
-import autoTable from 'jspdf-autotable';
+import 'jspdf-autotable';
 
 const StaffList = ({ onAddStaff, staffData, onStaffUpdate, isLoading }) => {
   const [showEditModal, setShowEditModal] = useState(false);
@@ -402,6 +402,22 @@ const StaffList = ({ onAddStaff, staffData, onStaffUpdate, isLoading }) => {
       return sortDirection === 'asc' ? comparison : -comparison;
     });
 
+  // Calculate unique departments
+  const uniqueDepartments = new Set(staffData.map(staff => staff.department));
+  const totalDepartments = uniqueDepartments.size;
+
+  // Calculate staff by position
+  const staffByPosition = staffData.reduce((acc, staff) => {
+    acc[staff.position] = (acc[staff.position] || 0) + 1;
+    return acc;
+  }, {});
+
+  // Calculate staff by department
+  const staffByDepartment = staffData.reduce((acc, staff) => {
+    acc[staff.department] = (acc[staff.department] || 0) + 1;
+    return acc;
+  }, {});
+
   const handleSort = (field) => {
     if (field === sortField) {
       setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc');
@@ -597,8 +613,293 @@ const StaffList = ({ onAddStaff, staffData, onStaffUpdate, isLoading }) => {
     doc.save(`staff_directory_${new Date().toISOString().split('T')[0]}.pdf`);
   };
 
+  const downloadSearchResults = () => {
+    if (filteredAndSortedStaff.length === 0) {
+      toast.warning('No search results to download');
+      return;
+    }
+
+    const doc = new jsPDF();
+    
+    // Header with logo and title
+    doc.setFillColor(232, 240, 254);
+    doc.rect(0, 0, 210, 30, 'F');
+    
+    // Add NIBM logo
+    try {
+      const logoUrl = '/images/nibm-logo.jpeg';
+      doc.addImage(logoUrl, 'JPEG', 15, 5, 40, 20, undefined, 'FAST');
+    } catch (error) {
+      console.error('Error adding logo to PDF:', error);
+    }
+    
+    // Title
+    doc.setFontSize(24);
+    doc.setTextColor(13, 110, 253);
+    doc.text('Search Results', 105, 15, { align: 'center' });
+    
+    // Search Criteria
+    doc.setFontSize(10);
+    doc.setTextColor(100, 100, 100);
+    doc.text(`Search Term: "${searchTerm}"`, 105, 25, { align: 'center' });
+    doc.text(`Sort By: ${sortField} (${sortDirection})`, 105, 30, { align: 'center' });
+    doc.text(`Generated on: ${new Date().toLocaleDateString()}`, 105, 35, { align: 'center' });
+
+    // Table headers
+    const headers = [['Name', 'Position', 'Department', 'Email', 'Phone']];
+    const data = filteredAndSortedStaff.map(staff => [
+      staff.name,
+      staff.position,
+      staff.department,
+      staff.email,
+      staff.phone
+    ]);
+
+    // Add table using jspdf-autotable
+    doc.autoTable({
+      head: headers,
+      body: data,
+      startY: 45,
+      theme: 'grid',
+      styles: {
+        fontSize: 8,
+        cellPadding: 2,
+      },
+      headStyles: {
+        fillColor: [13, 110, 253],
+        textColor: 255,
+        fontSize: 9,
+        fontStyle: 'bold',
+      },
+      alternateRowStyles: {
+        fillColor: [248, 249, 250],
+      },
+    });
+
+    // Footer
+    const pageCount = doc.internal.getNumberOfPages();
+    for (let i = 1; i <= pageCount; i++) {
+      doc.setPage(i);
+      doc.setFontSize(8);
+      doc.setTextColor(150, 150, 150);
+      doc.text(`Page ${i} of ${pageCount}`, 105, 290, { align: 'center' });
+      doc.text('NIBM Staff Management System', 105, 295, { align: 'center' });
+    }
+
+    doc.save(`search_results_${new Date().toISOString().split('T')[0]}.pdf`);
+  };
+
+  const downloadSearchResultsExcel = () => {
+    if (filteredAndSortedStaff.length === 0) {
+      toast.warning('No search results to download');
+      return;
+    }
+
+    const data = filteredAndSortedStaff.map(staff => ({
+      Name: staff.name,
+      Position: staff.position,
+      Department: staff.department,
+      Email: staff.email,
+      Phone: staff.phone,
+      'Join Date': new Date(staff.joinDate).toLocaleDateString(),
+      'Academic Schedule': Object.entries(staff.academicActivities || {})
+        .map(([day, activities]) => {
+          if (!Array.isArray(activities) || activities.length === 0) return '';
+          return `${day}: ${activities.map(a => 
+            `${a.startTime}-${a.endTime} (${a.lectureHall})`
+          ).join('; ')}`;
+        })
+        .filter(schedule => schedule !== '')
+        .join(' | ')
+    }));
+
+    const worksheet = XLSX.utils.json_to_sheet(data);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, 'Search Results');
+    XLSX.writeFile(workbook, `search_results_${new Date().toISOString().split('T')[0]}.xlsx`);
+  };
+
+  const downloadSearchResultsCSV = () => {
+    if (filteredAndSortedStaff.length === 0) {
+      toast.warning('No search results to download');
+      return;
+    }
+
+    const headers = [
+      'Name', 'Position', 'Department', 'Email', 'Phone', 'Join Date', 'Academic Schedule'
+    ];
+
+    const csvData = filteredAndSortedStaff.map(staff => {
+      const scheduleText = Object.entries(staff.academicActivities || {})
+        .map(([day, activities]) => {
+          if (!Array.isArray(activities) || activities.length === 0) return '';
+          return `${day}: ${activities.map(a => 
+            `${a.startTime}-${a.endTime} (${a.lectureHall})`
+          ).join('; ')}`;
+        })
+        .filter(schedule => schedule !== '')
+        .join(' | ');
+
+      return [
+        staff.name,
+        staff.position,
+        staff.department,
+        staff.email,
+        staff.phone,
+        new Date(staff.joinDate).toLocaleDateString(),
+        scheduleText
+      ];
+    });
+
+    const csvContent = [
+      headers.join(','),
+      ...csvData.map(row => row.map(cell => `"${cell}"`).join(','))
+    ].join('\n');
+
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = `search_results_${new Date().toISOString().split('T')[0]}.csv`;
+    link.click();
+  };
+
   return (
     <div className="mt-4">
+      {/* Statistics Section */}
+      <div className="row mb-4">
+        <div className="col-md-6">
+          <div className="card border-0 h-100" style={{ 
+            borderRadius: '20px',
+            background: 'rgba(13, 110, 253, 0.1)',
+            backdropFilter: 'blur(10px)',
+            boxShadow: '0 8px 32px rgba(13, 110, 253, 0.1)',
+            border: '1px solid rgba(255, 255, 255, 0.2)',
+            transition: 'all 0.3s ease'
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.transform = 'translateY(-5px)';
+            e.currentTarget.style.boxShadow = '0 12px 40px rgba(13, 110, 253, 0.15)';
+            e.currentTarget.style.background = 'rgba(13, 110, 253, 0.15)';
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.transform = 'translateY(0)';
+            e.currentTarget.style.boxShadow = '0 8px 32px rgba(13, 110, 253, 0.1)';
+            e.currentTarget.style.background = 'rgba(13, 110, 253, 0.1)';
+          }}>
+            <div className="card-body p-4">
+              <div className="d-flex align-items-center justify-content-between">
+                <div>
+                  <h6 className="text-primary mb-2" style={{ fontSize: '1rem' }}>
+                    <i className="fas fa-users me-2"></i>
+                    Total Staff Members
+                  </h6>
+                  <h2 className="text-primary mb-0" style={{ fontSize: '2.5rem', fontWeight: '600' }}>
+                    {staffData.length}
+                  </h2>
+                  <div className="mt-3">
+                    <span className="badge bg-primary bg-opacity-10 text-primary px-3 py-2 rounded-pill">
+                      <i className="fas fa-chart-line me-1"></i>
+                      Active Members
+                    </span>
+                  </div>
+                </div>
+                <div className="text-end">
+                  <div className="bg-primary bg-opacity-10 rounded-circle p-3 d-inline-block">
+                    <i className="fas fa-users text-primary fa-3x"></i>
+                  </div>
+                  <div className="mt-3">
+                    <small className="text-primary text-opacity-75">
+                      <i className="fas fa-info-circle me-1"></i>
+                      Total number of staff members in the system
+                    </small>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div className="col-md-6">
+          <div className="card border-0 h-100" style={{ 
+            borderRadius: '20px',
+            background: 'rgba(25, 135, 84, 0.1)',
+            backdropFilter: 'blur(10px)',
+            boxShadow: '0 8px 32px rgba(25, 135, 84, 0.1)',
+            border: '1px solid rgba(255, 255, 255, 0.2)',
+            transition: 'all 0.3s ease'
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.transform = 'translateY(-5px)';
+            e.currentTarget.style.boxShadow = '0 12px 40px rgba(25, 135, 84, 0.15)';
+            e.currentTarget.style.background = 'rgba(25, 135, 84, 0.15)';
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.transform = 'translateY(0)';
+            e.currentTarget.style.boxShadow = '0 8px 32px rgba(25, 135, 84, 0.1)';
+            e.currentTarget.style.background = 'rgba(25, 135, 84, 0.1)';
+          }}>
+            <div className="card-body p-4">
+              <div className="d-flex align-items-center justify-content-between">
+                <div>
+                  <h6 className="text-success mb-2" style={{ fontSize: '1rem' }}>
+                    <i className="fas fa-building me-2"></i>
+                    Total Departments
+                  </h6>
+                  <h2 className="text-success mb-0" style={{ fontSize: '2.5rem', fontWeight: '600' }}>
+                    {totalDepartments}
+                  </h2>
+                  <div className="mt-3">
+                    <span className="badge bg-success bg-opacity-10 text-success px-3 py-2 rounded-pill">
+                      <i className="fas fa-chart-pie me-1"></i>
+                      Active Departments
+                    </span>
+                  </div>
+                </div>
+                <div className="text-end">
+                  <div className="bg-success bg-opacity-10 rounded-circle p-3 d-inline-block">
+                    <i className="fas fa-building text-success fa-3x"></i>
+                  </div>
+                  <div className="mt-3">
+                    <small className="text-success text-opacity-75">
+                      <i className="fas fa-info-circle me-1"></i>
+                      Unique departments across the institution
+                    </small>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Department Distribution */}
+      <div className="card border-0 shadow-sm mb-4" style={{ borderRadius: '20px' }}>
+        <div className="card-body p-4">
+          <h5 className="text-primary mb-3">
+            <i className="fas fa-chart-pie me-2"></i>
+            Department Distribution
+          </h5>
+          <div className="row">
+            {Object.entries(staffByDepartment).map(([department, count]) => (
+              <div key={department} className="col-md-3 mb-3">
+                <div className="d-flex align-items-center p-3 rounded" 
+                  style={{ 
+                    background: 'linear-gradient(135deg, #ffffff, #f8f9fa)',
+                    border: '1px solid rgba(0,0,0,0.05)'
+                  }}>
+                  <div className="bg-primary bg-opacity-10 rounded-circle p-2 me-3">
+                    <i className="fas fa-building text-primary"></i>
+                  </div>
+                  <div>
+                    <h6 className="mb-1">{department}</h6>
+                    <small className="text-muted">{count} staff members</small>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
       <div className="d-flex justify-content-between align-items-center mb-4">
         <h3 className="text-primary mb-0">
           <i className="fas fa-users me-2"></i>
@@ -673,7 +974,7 @@ const StaffList = ({ onAddStaff, staffData, onStaffUpdate, isLoading }) => {
                       </div>
                       <div>
                         <div>Download Excel</div>
-                        <small className="text-muted">Spreadsheet Format</small>
+                        <small className="text-muted">All Staff Data</small>
                       </div>
                     </button>
                     <button
@@ -698,7 +999,7 @@ const StaffList = ({ onAddStaff, staffData, onStaffUpdate, isLoading }) => {
                       </div>
                       <div>
                         <div>Download CSV</div>
-                        <small className="text-muted">Comma Separated Values</small>
+                        <small className="text-muted">All Staff Data</small>
                       </div>
                     </button>
                     <button
@@ -723,7 +1024,86 @@ const StaffList = ({ onAddStaff, staffData, onStaffUpdate, isLoading }) => {
                       </div>
                       <div>
                         <div>Download PDF</div>
-                        <small className="text-muted">Professional Document Format</small>
+                        <small className="text-muted">All Staff Data</small>
+                      </div>
+                    </button>
+                    <div className="border-top my-2"></div>
+                    <div className="px-2 py-1 mb-1">
+                      <small className="text-muted">Search Results</small>
+                    </div>
+                    <button
+                      className="btn btn-link text-dark w-100 text-start p-2 d-flex align-items-center"
+                      onClick={() => {
+                        downloadSearchResultsExcel();
+                        setShowDownloadMenu(false);
+                      }}
+                      style={{ 
+                        borderRadius: '10px',
+                        transition: 'all 0.2s ease'
+                      }}
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.background = 'rgba(25, 135, 84, 0.1)';
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.background = 'transparent';
+                      }}
+                    >
+                      <div className="bg-success bg-opacity-10 rounded-circle p-2 me-2">
+                        <i className="fas fa-file-excel text-success"></i>
+                      </div>
+                      <div>
+                        <div>Download Excel</div>
+                        <small className="text-muted">Search Results</small>
+                      </div>
+                    </button>
+                    <button
+                      className="btn btn-link text-dark w-100 text-start p-2 d-flex align-items-center"
+                      onClick={() => {
+                        downloadSearchResultsCSV();
+                        setShowDownloadMenu(false);
+                      }}
+                      style={{ 
+                        borderRadius: '10px',
+                        transition: 'all 0.2s ease'
+                      }}
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.background = 'rgba(13, 110, 253, 0.1)';
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.background = 'transparent';
+                      }}
+                    >
+                      <div className="bg-primary bg-opacity-10 rounded-circle p-2 me-2">
+                        <i className="fas fa-file-csv text-primary"></i>
+                      </div>
+                      <div>
+                        <div>Download CSV</div>
+                        <small className="text-muted">Search Results</small>
+                      </div>
+                    </button>
+                    <button
+                      className="btn btn-link text-dark w-100 text-start p-2 d-flex align-items-center"
+                      onClick={() => {
+                        downloadSearchResults();
+                        setShowDownloadMenu(false);
+                      }}
+                      style={{ 
+                        borderRadius: '10px',
+                        transition: 'all 0.2s ease'
+                      }}
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.background = 'rgba(220, 53, 69, 0.1)';
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.background = 'transparent';
+                      }}
+                    >
+                      <div className="bg-danger bg-opacity-10 rounded-circle p-2 me-2">
+                        <i className="fas fa-file-pdf text-danger"></i>
+                      </div>
+                      <div>
+                        <div>Download PDF</div>
+                        <small className="text-muted">Search Results</small>
                       </div>
                     </button>
                   </div>
