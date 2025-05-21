@@ -31,8 +31,8 @@ const Login = ({ onLogin }) => {
         
         // Store authentication state and redirect after animation
         setTimeout(() => {
-          localStorage.setItem('isAuthenticated', 'true');
-          onLogin();
+      localStorage.setItem('isAuthenticated', 'true');
+      onLogin();
         }, 3500); // Wait for 3.5 seconds to show the animation
       }
     } catch (error) {
@@ -304,7 +304,7 @@ const Login = ({ onLogin }) => {
           <div
             key={i}
             className="position-absolute"
-            style={{
+        style={{
               width: `${Math.random() * 4 + 2}px`,
               height: `${Math.random() * 4 + 2}px`,
               background: 'rgba(255, 255, 255, 0.3)',
