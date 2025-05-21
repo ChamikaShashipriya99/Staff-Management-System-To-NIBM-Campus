@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { toast } from 'react-toastify';
+import axios from 'axios';
 
 const Login = ({ onLogin }) => {
   const [formData, setFormData] = useState({
@@ -17,22 +18,25 @@ const Login = ({ onLogin }) => {
     }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setIsLoading(true);
 
-    // Check credentials
-    if (formData.email === 'admin@gmail.com' && formData.password === 'Admin123#') {
-      // Show success animation
-      setIsLoginSuccess(true);
+    try {
+      const response = await axios.post('http://localhost:5000/api/auth/login', formData);
       
-      // Store authentication state and redirect after animation
-      setTimeout(() => {
-        localStorage.setItem('isAuthenticated', 'true');
-        onLogin();
-      }, 3500); // Wait for 3.5 seconds to show the animation
-    } else {
-      toast.error('Invalid email or password');
+      if (response.data.success) {
+        // Show success animation
+        setIsLoginSuccess(true);
+        
+        // Store authentication state and redirect after animation
+        setTimeout(() => {
+          localStorage.setItem('isAuthenticated', 'true');
+          onLogin();
+        }, 3500); // Wait for 3.5 seconds to show the animation
+      }
+    } catch (error) {
+      toast.error(error.response?.data?.message || 'Invalid email or password');
       setIsLoading(false);
     }
   };

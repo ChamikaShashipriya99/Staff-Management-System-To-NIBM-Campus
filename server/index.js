@@ -3,6 +3,7 @@ const cors = require('cors');
 const dotenv = require('dotenv');
 const connectDB = require('./config/db');
 const staffRoutes = require('./routes/staff');
+const authRoutes = require('./routes/auth');
 
 dotenv.config();
 
@@ -18,6 +19,7 @@ app.use(express.urlencoded({ limit: '50mb', extended: true }));
 
 // Routes
 app.use('/api/staff', staffRoutes);
+app.use('/api/auth', authRoutes);
 
 app.get('/', (req, res) => {
   res.json({ message: 'Welcome to the Staff Management API' });
