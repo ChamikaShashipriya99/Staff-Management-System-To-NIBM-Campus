@@ -53,24 +53,45 @@ const Login = ({ onLogin }) => {
       >
         {/* Success Animation Container */}
         <div className="text-center" style={{ position: 'relative', zIndex: 2 }}>
-          <div className="success-checkmark">
-            <div className="check-icon">
-              <span className="icon-line line-tip"></span>
-              <span className="icon-line line-long"></span>
-              <div className="icon-circle"></div>
-              <div className="icon-fix"></div>
+          <div className="success-animation">
+            <div className="success-checkmark">
+              <div className="check-icon">
+                <span className="icon-line line-tip"></span>
+                <span className="icon-line line-long"></span>
+                <div className="icon-circle"></div>
+                <div className="icon-fix"></div>
+              </div>
+            </div>
+            <div className="success-rings">
+              <div className="ring ring-1"></div>
+              <div className="ring ring-2"></div>
+              <div className="ring ring-3"></div>
+            </div>
+            <div className="success-particles">
+              {[...Array(12)].map((_, i) => (
+                <div key={i} className="particle" style={{ '--i': i }}></div>
+              ))}
             </div>
           </div>
-          <h3 className="text-white mt-4 mb-2">Login Successful!</h3>
-          <p className="text-white-50">Redirecting to dashboard...</p>
+          <h3 className="text-white mt-4 mb-2 success-title">Login Successful!</h3>
+          <p className="text-white-50 success-subtitle">Redirecting to dashboard...</p>
         </div>
 
         <style>
           {`
+            .success-animation {
+              position: relative;
+              width: 120px;
+              height: 120px;
+              margin: 0 auto;
+            }
+
             .success-checkmark {
               width: 80px;
               height: 80px;
               margin: 0 auto;
+              position: relative;
+              z-index: 2;
             }
 
             .success-checkmark .check-icon {
@@ -80,6 +101,7 @@ const Login = ({ onLogin }) => {
               border-radius: 50%;
               box-sizing: content-box;
               border: 4px solid #4CAF50;
+              animation: scaleIn 0.5s ease-out;
             }
 
             .success-checkmark .check-icon::before {
@@ -114,6 +136,7 @@ const Login = ({ onLogin }) => {
               border-radius: 2px;
               position: absolute;
               z-index: 10;
+              animation: line-draw 0.75s ease-out forwards;
             }
 
             .success-checkmark .check-icon .icon-line.line-tip {
@@ -142,6 +165,7 @@ const Login = ({ onLogin }) => {
               position: absolute;
               box-sizing: content-box;
               border: 4px solid rgba(76, 175, 80, .5);
+              animation: circle-draw 0.75s ease-out forwards;
             }
 
             .success-checkmark .check-icon .icon-fix {
@@ -153,6 +177,121 @@ const Login = ({ onLogin }) => {
               position: absolute;
               transform: rotate(-45deg);
               background-color: #FFFFFF;
+            }
+
+            .success-rings {
+              position: absolute;
+              top: 50%;
+              left: 50%;
+              transform: translate(-50%, -50%);
+              width: 100%;
+              height: 100%;
+            }
+
+            .ring {
+              position: absolute;
+              top: 50%;
+              left: 50%;
+              transform: translate(-50%, -50%);
+              border: 2px solid rgba(255, 255, 255, 0.3);
+              border-radius: 50%;
+              animation: ring-expand 1.5s ease-out infinite;
+            }
+
+            .ring-1 { width: 100%; height: 100%; animation-delay: 0s; }
+            .ring-2 { width: 120%; height: 120%; animation-delay: 0.2s; }
+            .ring-3 { width: 140%; height: 140%; animation-delay: 0.4s; }
+
+            .success-particles {
+              position: absolute;
+              top: 50%;
+              left: 50%;
+              transform: translate(-50%, -50%);
+              width: 100%;
+              height: 100%;
+            }
+
+            .particle {
+              position: absolute;
+              width: 6px;
+              height: 6px;
+              background: rgba(255, 255, 255, 0.5);
+              border-radius: 50%;
+              top: 50%;
+              left: 50%;
+              transform: translate(-50%, -50%);
+              animation: particle-move 1.5s ease-out infinite;
+              animation-delay: calc(var(--i) * 0.1s);
+            }
+
+            .success-title {
+              animation: slideUp 0.5s ease-out 0.5s both;
+            }
+
+            .success-subtitle {
+              animation: slideUp 0.5s ease-out 0.7s both;
+            }
+
+            @keyframes scaleIn {
+              from { transform: scale(0); }
+              to { transform: scale(1); }
+            }
+
+            @keyframes circle-draw {
+              from { stroke-dashoffset: 283; }
+              to { stroke-dashoffset: 0; }
+            }
+
+            @keyframes line-draw {
+              from { width: 0; }
+              to { width: 100%; }
+            }
+
+            @keyframes ring-expand {
+              0% { 
+                transform: translate(-50%, -50%) scale(0.8);
+                opacity: 0;
+              }
+              50% { 
+                transform: translate(-50%, -50%) scale(1.2);
+                opacity: 0.5;
+              }
+              100% { 
+                transform: translate(-50%, -50%) scale(0.8);
+                opacity: 0;
+              }
+            }
+
+            @keyframes particle-move {
+              0% {
+                transform: translate(-50%, -50%) scale(0);
+                opacity: 0;
+              }
+              50% {
+                transform: translate(-50%, -50%) scale(1) translate(
+                  calc(cos(var(--i) * 30deg) * 50px),
+                  calc(sin(var(--i) * 30deg) * 50px)
+                );
+                opacity: 1;
+              }
+              100% {
+                transform: translate(-50%, -50%) scale(0) translate(
+                  calc(cos(var(--i) * 30deg) * 100px),
+                  calc(sin(var(--i) * 30deg) * 100px)
+                );
+                opacity: 0;
+              }
+            }
+
+            @keyframes slideUp {
+              from {
+                opacity: 0;
+                transform: translateY(20px);
+              }
+              to {
+                opacity: 1;
+                transform: translateY(0);
+              }
             }
 
             @keyframes rotate-circle {
