@@ -1071,56 +1071,6 @@ const StaffList = ({ onAddStaff, staffData, onStaffUpdate, isLoading }) => {
                     <button
                       className="btn btn-link text-dark w-100 text-start p-2 d-flex align-items-center"
                       onClick={() => {
-                        downloadSearchResultsExcel();
-                        setShowDownloadMenu(false);
-                      }}
-                      style={{ 
-                        borderRadius: '10px',
-                        transition: 'all 0.2s ease'
-                      }}
-                      onMouseEnter={(e) => {
-                        e.currentTarget.style.background = 'rgba(25, 135, 84, 0.1)';
-                      }}
-                      onMouseLeave={(e) => {
-                        e.currentTarget.style.background = 'transparent';
-                      }}
-                    >
-                      <div className="bg-success bg-opacity-10 rounded-circle p-2 me-2">
-                        <i className="fas fa-file-excel text-success"></i>
-                      </div>
-                      <div>
-                        <div>Download Excel</div>
-                        <small className="text-muted">Search Results</small>
-                      </div>
-                    </button>
-                    <button
-                      className="btn btn-link text-dark w-100 text-start p-2 d-flex align-items-center"
-                      onClick={() => {
-                        downloadSearchResultsCSV();
-                        setShowDownloadMenu(false);
-                      }}
-                      style={{ 
-                        borderRadius: '10px',
-                        transition: 'all 0.2s ease'
-                      }}
-                      onMouseEnter={(e) => {
-                        e.currentTarget.style.background = 'rgba(13, 110, 253, 0.1)';
-                      }}
-                      onMouseLeave={(e) => {
-                        e.currentTarget.style.background = 'transparent';
-                      }}
-                    >
-                      <div className="bg-primary bg-opacity-10 rounded-circle p-2 me-2">
-                        <i className="fas fa-file-csv text-primary"></i>
-                      </div>
-                      <div>
-                        <div>Download CSV</div>
-                        <small className="text-muted">Search Results</small>
-                      </div>
-                    </button>
-                    <button
-                      className="btn btn-link text-dark w-100 text-start p-2 d-flex align-items-center"
-                      onClick={() => {
                         downloadSearchResults();
                         setShowDownloadMenu(false);
                       }}
