@@ -27,13 +27,6 @@ The NIBM Staff Management System is a comprehensive digital solution designed to
   - Real-time data updates
   - Interactive dashboards
 
-### Security & Access
-- **Data Protection**
-  - Role-based access control
-  - Secure authentication
-  - Data encryption
-  - Audit logging
-
 ### System Features
 - **Performance & Reliability**
   - Fast data retrieval

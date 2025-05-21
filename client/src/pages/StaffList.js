@@ -479,6 +479,124 @@ const StaffList = ({ onAddStaff, staffData, onStaffUpdate, isLoading }) => {
     XLSX.writeFile(workbook, `staff_list_${new Date().toISOString().split('T')[0]}.xlsx`);
   };
 
+  const downloadPDF = () => {
+    const doc = new jsPDF();
+    
+    filteredAndSortedStaff.forEach((staff, index) => {
+      // Add new page for each staff member (except first one)
+      if (index > 0) {
+        doc.addPage();
+      }
+
+      // Header with logo and title - Using lighter colors
+      doc.setFillColor(232, 240, 254); // Light blue background
+      doc.rect(0, 0, 210, 30, 'F');
+      
+      // Add NIBM logo
+      try {
+        const logoUrl = '/images/nibm-logo.jpeg'; // Updated file extension
+        doc.addImage(logoUrl, 'JPEG', 15, 5, 40, 20, undefined, 'FAST');
+      } catch (error) {
+        console.error('Error adding logo to PDF:', error);
+      }
+      
+      // Title
+      doc.setFontSize(24);
+      doc.setTextColor(13, 110, 253); // Primary blue for text
+      doc.text('NIBM Staff Profiles', 105, 15, { align: 'center' });
+      
+      // Date
+      doc.setFontSize(10);
+      doc.setTextColor(100, 100, 100);
+      doc.text(`Generated on: ${new Date().toLocaleDateString()}`, 105, 25, { align: 'center' });
+
+      // Staff Information Section with Photo
+      doc.setFillColor(248, 249, 250); // Lighter gray background
+      doc.rect(10, 50, 190, 50, 'F');
+      
+      // Add staff photo
+      if (staff.photo) {
+        try {
+          // Create a temporary image element to get the image dimensions
+          const img = new Image();
+          img.src = staff.photo;
+          
+          // Add the image with a white border
+          doc.setDrawColor(255, 255, 255);
+          doc.setLineWidth(2);
+          doc.rect(20, 55, 40, 40, 'F'); // White background for photo
+          doc.addImage(staff.photo, 'JPEG', 20, 55, 40, 40, undefined, 'FAST');
+          doc.rect(20, 55, 40, 40, 'S'); // Border around photo
+        } catch (error) {
+          console.error('Error adding image to PDF:', error);
+        }
+      }
+      
+      // Staff Name and Position (moved to the right of the photo)
+      doc.setFontSize(18);
+      doc.setTextColor(13, 110, 253);
+      doc.text(staff.name, 70, 65);
+      
+      doc.setFontSize(12);
+      doc.setTextColor(100, 100, 100);
+      doc.text(staff.position, 70, 75);
+
+      // Contact Information Section
+      doc.setFontSize(12);
+      doc.setTextColor(13, 110, 253);
+      doc.text('Contact Information', 20, 115);
+      
+      doc.setFontSize(10);
+      doc.setTextColor(100, 100, 100);
+      doc.text(`Email: ${staff.email}`, 20, 125);
+      doc.text(`Phone: ${staff.phone}`, 20, 135);
+      doc.text(`Department: ${staff.department}`, 20, 145);
+      doc.text(`Join Date: ${new Date(staff.joinDate).toLocaleDateString()}`, 20, 155);
+
+      // Academic Schedule Section
+      const hasActivities = Object.values(staff.academicActivities || {}).some(activities => 
+        Array.isArray(activities) && activities.length > 0
+      );
+
+      if (hasActivities) {
+        doc.setFontSize(12);
+        doc.setTextColor(13, 110, 253);
+        doc.text('Weekly Schedule', 20, 175);
+
+        let yPosition = 185;
+        Object.entries(staff.academicActivities).forEach(([day, activities]) => {
+          if (Array.isArray(activities) && activities.length > 0) {
+            // Day header
+            doc.setFontSize(10);
+            doc.setTextColor(13, 110, 253);
+            const dayText = day.charAt(0).toUpperCase() + day.slice(1);
+            doc.text(dayText, 25, yPosition);
+            yPosition += 7;
+
+            // Activities
+            doc.setTextColor(100, 100, 100);
+            activities.forEach(activity => {
+              doc.text(`• ${activity.startTime} - ${activity.endTime} (${activity.lectureHall})`, 30, yPosition);
+              yPosition += 7;
+            });
+            yPosition += 3; // Add space between days
+          }
+        });
+      }
+
+      // Footer with lighter colors
+      doc.setDrawColor(220, 220, 220); // Lighter gray for the line
+      doc.line(10, 280, 200, 280);
+      doc.setFontSize(8);
+      doc.setTextColor(150, 150, 150);
+      doc.text('NIBM Staff Management System', 105, 290, { align: 'center' });
+      doc.text(`Page ${index + 1} of ${filteredAndSortedStaff.length}`, 105, 295, { align: 'center' });
+    });
+
+    // Save the PDF
+    doc.save(`staff_directory_${new Date().toISOString().split('T')[0]}.pdf`);
+  };
+
   return (
     <div className="mt-4">
       <div className="d-flex justify-content-between align-items-center mb-4">
@@ -581,6 +699,31 @@ const StaffList = ({ onAddStaff, staffData, onStaffUpdate, isLoading }) => {
                       <div>
                         <div>Download CSV</div>
                         <small className="text-muted">Comma Separated Values</small>
+                      </div>
+                    </button>
+                    <button
+                      className="btn btn-link text-dark w-100 text-start p-2 d-flex align-items-center"
+                      onClick={() => {
+                        downloadPDF();
+                        setShowDownloadMenu(false);
+                      }}
+                      style={{ 
+                        borderRadius: '10px',
+                        transition: 'all 0.2s ease'
+                      }}
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.background = 'rgba(220, 53, 69, 0.1)';
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.background = 'transparent';
+                      }}
+                    >
+                      <div className="bg-danger bg-opacity-10 rounded-circle p-2 me-2">
+                        <i className="fas fa-file-pdf text-danger"></i>
+                      </div>
+                      <div>
+                        <div>Download PDF</div>
+                        <small className="text-muted">Professional Document Format</small>
                       </div>
                     </button>
                   </div>
