@@ -122,15 +122,39 @@ function App() {
             backdropFilter: 'blur(8px)',
             WebkitBackdropFilter: 'blur(8px)',
             border: '1px solid rgba(255, 255, 255, 0.15)',
-            top: '10px'
+            top: '10px',
+            transition: 'all 0.3s ease',
+            boxShadow: '0 8px 32px rgba(13, 110, 253, 0.2)'
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.backgroundColor = 'rgba(13, 110, 253, 0.75)';
+            e.currentTarget.style.boxShadow = '0 12px 40px rgba(13, 110, 253, 0.3)';
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.backgroundColor = 'rgba(13, 110, 253, 0.65)';
+            e.currentTarget.style.boxShadow = '0 8px 32px rgba(13, 110, 253, 0.2)';
           }}>
           <div className="container-fluid">
-            <a className="navbar-brand d-flex align-items-center" href="#">
+            <a className="navbar-brand d-flex align-items-center" href="#" style={{
+              transition: 'all 0.3s ease',
+              transform: 'translateY(0)'
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.transform = 'translateY(-2px)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.transform = 'translateY(0)';
+            }}>
               {!logoError ? (
                 <img 
                   src="/images/cinec-logo.png"
                   alt="CINEC Logo" 
-                  style={{ height: '40px', marginRight: '15px' }}
+                  style={{ 
+                    height: '40px', 
+                    marginRight: '15px',
+                    transition: 'all 0.3s ease',
+                    filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.1))'
+                  }}
                   onError={handleLogoError}
                 />
               ) : (
@@ -147,7 +171,23 @@ function App() {
                   <button 
                     className={`nav-link btn btn-link ${currentPage === 'addStaff' ? 'active' : ''}`} 
                     onClick={() => setCurrentPage('addStaff')}
-                    style={{ textDecoration: 'none' }}
+                    style={{ 
+                      textDecoration: 'none',
+                      color: 'rgba(255, 255, 255, 0.9)',
+                      transition: 'all 0.3s ease',
+                      position: 'relative',
+                      padding: '8px 16px',
+                      borderRadius: '10px',
+                      margin: '0 5px'
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.color = '#ffffff';
+                      e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.1)';
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.color = 'rgba(255, 255, 255, 0.9)';
+                      e.currentTarget.style.backgroundColor = 'transparent';
+                    }}
                   >
                     <i className="fas fa-user-plus me-2"></i>
                     Add Staff
@@ -157,7 +197,23 @@ function App() {
                   <button 
                     className={`nav-link btn btn-link ${currentPage === 'staff' ? 'active' : ''}`} 
                     onClick={() => setCurrentPage('staff')}
-                    style={{ textDecoration: 'none' }}
+                    style={{ 
+                      textDecoration: 'none',
+                      color: 'rgba(255, 255, 255, 0.9)',
+                      transition: 'all 0.3s ease',
+                      position: 'relative',
+                      padding: '8px 16px',
+                      borderRadius: '10px',
+                      margin: '0 5px'
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.color = '#ffffff';
+                      e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.1)';
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.color = 'rgba(255, 255, 255, 0.9)';
+                      e.currentTarget.style.backgroundColor = 'transparent';
+                    }}
                   >
                     <i className="fas fa-users me-2"></i>
                     Staff
@@ -170,7 +226,20 @@ function App() {
                 style={{ 
                   borderRadius: '10px',
                   padding: '8px 20px',
-                  transition: 'all 0.3s ease'
+                  transition: 'all 0.3s ease',
+                  borderWidth: '2px',
+                  position: 'relative',
+                  overflow: 'hidden'
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.transform = 'translateY(-2px)';
+                  e.currentTarget.style.boxShadow = '0 4px 12px rgba(255, 255, 255, 0.2)';
+                  e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.1)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.transform = 'translateY(0)';
+                  e.currentTarget.style.boxShadow = 'none';
+                  e.currentTarget.style.backgroundColor = 'transparent';
                 }}
               >
                 <i className="fas fa-sign-out-alt me-2"></i>
