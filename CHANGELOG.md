@@ -18,4 +18,7 @@ All notable changes to this project will be documented in this file.
 - Registered users can now log in with their details.
 - Register page now uses the exact same 3D animated background and CSS as the Login page for a consistent look.
 - Fixed registration failure by installing and adding bcrypt to server dependencies for password hashing.
-- Optimized staff fetching: now uses .lean() and selects only needed fields for faster loading after login. 
+- Optimized staff fetching: now uses .lean() and selects only needed fields for faster loading after login.
+- Created a separate Lecturer database/model and added registration and login endpoints for lecturers, with full validation and password hashing.
+- Created a separate LecturerLogin page and updated App.js to support toggling between Admin and Lecturer login pages. Login.js now links to Lecturer login.
+- Enabled navigation between Admin and Lecturer login pages with links/buttons on both forms. 

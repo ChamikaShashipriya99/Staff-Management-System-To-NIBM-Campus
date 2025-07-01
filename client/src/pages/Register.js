@@ -41,7 +41,7 @@ const Register = ({ onRegister, onShowLogin }) => {
     if (!validate()) return;
     setIsLoading(true);
     try {
-      const response = await axios.post('http://localhost:5000/api/auth/register', {
+      const response = await axios.post('http://localhost:5000/api/auth/lecturer/register', {
         name: formData.name,
         lecturerId: formData.lecturerId,
         email: formData.email,
