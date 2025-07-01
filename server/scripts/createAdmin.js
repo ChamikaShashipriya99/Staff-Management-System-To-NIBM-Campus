@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 const Admin = require('../models/Admin');
 const connectDB = require('../config/db');
+const bcrypt = require('bcrypt');
 
 const createAdmin = async () => {
   try {
@@ -15,10 +16,15 @@ const createAdmin = async () => {
       process.exit(0);
     }
 
+    // Hash the password
+    const hashedPassword = await bcrypt.hash('Admin123#', 10);
+
     // Create new admin
     const admin = new Admin({
       email: 'admin@gmail.com',
-      password: 'Admin123#'
+      password: hashedPassword,
+      name: 'Admin',
+      lecturerId: 'admin001'
     });
 
     await admin.save();
