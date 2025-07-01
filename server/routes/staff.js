@@ -5,7 +5,8 @@ const Staff = require('../models/Staff');
 // Get all staff
 router.get('/', async (req, res) => {
   try {
-    const staff = await Staff.find();
+    // Only select fields needed for the list
+    const staff = await Staff.find().select('name email phone position department photo').lean();
     res.json(staff);
   } catch (error) {
     res.status(500).json({ message: error.message });

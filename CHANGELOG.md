@@ -17,4 +17,5 @@ All notable changes to this project will be documented in this file.
 - Registration success now uses the same animation as Login.
 - Registered users can now log in with their details.
 - Register page now uses the exact same 3D animated background and CSS as the Login page for a consistent look.
-- Fixed registration failure by installing and adding bcrypt to server dependencies for password hashing. 
+- Fixed registration failure by installing and adding bcrypt to server dependencies for password hashing.
+- Optimized staff fetching: now uses .lean() and selects only needed fields for faster loading after login. 
