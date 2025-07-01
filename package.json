@@ -1,5 +1,12 @@
 {
   "dependencies": {
-    "bootstrap": "^5.3.6"
+    "bcrypt": "^6.0.0",
+    "bootstrap": "^5.3.6",
+    "concurrently": "^8.2.2"
+  },
+  "scripts": {
+    "start": "concurrently \"npm run server\" \"npm run client\"",
+    "client": "cd client && npm start",
+    "server": "cd server && npm run dev"
   }
 }

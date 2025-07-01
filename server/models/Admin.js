@@ -9,6 +9,15 @@ const adminSchema = new mongoose.Schema({
   password: {
     type: String,
     required: true
+  },
+  name: {
+    type: String,
+    required: true
+  },
+  lecturerId: {
+    type: String,
+    required: true,
+    unique: true
   }
 }, {
   timestamps: true

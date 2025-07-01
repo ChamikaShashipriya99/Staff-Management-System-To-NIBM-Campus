@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { toast } from 'react-toastify';
 import axios from 'axios';
 
-const Login = ({ onLogin }) => {
+const Login = ({ onLogin, onShowRegister }) => {
   const [formData, setFormData] = useState({
     email: '',
     password: ''
@@ -620,6 +620,11 @@ const Login = ({ onLogin }) => {
               )}
             </button>
           </form>
+
+          <div className="mt-3 text-center">
+            <span>Don't have an account? </span>
+            <button type="button" className="btn btn-link p-0 align-baseline" onClick={onShowRegister} style={{textDecoration: 'underline'}}>Register</button>
+          </div>
         </div>
       </div>
 
