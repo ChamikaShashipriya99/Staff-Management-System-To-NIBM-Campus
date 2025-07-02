@@ -93,4 +93,14 @@ router.post('/lecturer/login', async (req, res) => {
   }
 });
 
+// Get all lecturers
+router.get('/lecturers', async (req, res) => {
+  try {
+    const lecturers = await Lecturer.find().select('name email lecturerId');
+    res.json(lecturers);
+  } catch (error) {
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
 module.exports = router; 

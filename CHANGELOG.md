@@ -25,6 +25,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 - Updated root package.json to include project metadata and concurrent execution scripts
 - Added concurrently as a dev dependency in the root package.json
+- Improved glassmorphism modal style for a more modern look in the contact info popup
+- Enhanced PDF manual: now concise, professional, and includes only essential sections
+- Improved contact info popup: scaled up the photo and changed it to a rounded-corner square
 
 ### Fixed
 - Fixed syntax error in Register.js component that was preventing user registration
