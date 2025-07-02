@@ -5,6 +5,8 @@ import 'react-toastify/dist/ReactToastify.css';
 import AddStaff from './pages/AddStaff';
 import StaffList from './pages/StaffList';
 import Login from './pages/Login';
+import Register from './pages/Register';
+import LecturerLogin from './pages/LecturerLogin';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import '@fortawesome/fontawesome-free/css/all.css';
 
@@ -14,6 +16,8 @@ function App() {
   const [isLoading, setIsLoading] = useState(true);
   const [logoError, setLogoError] = useState(false);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [showRegister, setShowRegister] = useState(false);
+  const [showLecturerLogin, setShowLecturerLogin] = useState(false);
 
   useEffect(() => {
     // Check if user is authenticated
@@ -64,9 +68,21 @@ function App() {
     toast.success('Welcome back!');
   };
 
+  const handleRegister = () => {
+    setShowRegister(false);
+    setCurrentPage('login');
+    toast.success('Registration successful! Please log in.');
+  };
+
   const renderPage = () => {
     if (!isAuthenticated) {
-      return <Login onLogin={handleLogin} />;
+      if (showRegister) {
+        return <Register onRegister={handleRegister} onShowLogin={() => setShowRegister(false)} />;
+      }
+      if (showLecturerLogin) {
+        return <LecturerLogin onLogin={handleLogin} onShowRegister={() => setShowRegister(true)} onShowAdminLogin={() => setShowLecturerLogin(false)} />;
+      }
+      return <Login onLogin={handleLogin} onShowRegister={() => setShowRegister(true)} onShowLecturerLogin={() => setShowLecturerLogin(true)} />;
     }
 
     switch (currentPage) {

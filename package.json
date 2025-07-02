@@ -15,8 +15,5 @@
   "license": "ISC",
   "dependencies": {
     "bootstrap": "^5.3.6"
-  },
-  "devDependencies": {
-    "concurrently": "^8.2.2"
   }
 }

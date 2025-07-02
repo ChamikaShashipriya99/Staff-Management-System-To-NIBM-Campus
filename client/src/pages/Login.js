@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { toast } from 'react-toastify';
 import axios from 'axios';
 
-const Login = ({ onLogin }) => {
+const Login = ({ onLogin, onShowRegister, onShowLecturerLogin }) => {
   const [formData, setFormData] = useState({
     email: '',
     password: ''
@@ -529,8 +529,8 @@ const Login = ({ onLogin }) => {
             >
               <i className="fas fa-user-lock text-primary fa-2x"></i>
             </div>
-            <h3 className="text-primary mb-1 fw-bold">Welcome Back</h3>
-            <p className="text-muted">Please login to your account</p>
+            <h3 className="text-primary mb-1 fw-bold">Admin Login</h3>
+            <p className="text-muted">Please login to your admin account</p>
           </div>
 
           <form onSubmit={handleSubmit}>
@@ -615,11 +615,21 @@ const Login = ({ onLogin }) => {
               ) : (
                 <>
                   <i className="fas fa-sign-in-alt me-2"></i>
-                  Login
+                  Admin Login
                 </>
               )}
             </button>
           </form>
+
+          <div className="mt-3 text-center">
+            <span>Don't have an account? </span>
+            <button type="button" className="btn btn-link p-0 align-baseline" onClick={onShowRegister} style={{textDecoration: 'underline'}}>Register</button>
+          </div>
+
+          <div className="mt-3 text-center">
+            <span>Are you a lecturer? </span>
+            <button type="button" className="btn btn-link p-0 align-baseline" onClick={onShowLecturerLogin} style={{textDecoration: 'underline'}}>Lecturer Login</button>
+          </div>
         </div>
       </div>
 
