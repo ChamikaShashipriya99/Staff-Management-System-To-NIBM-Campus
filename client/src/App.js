@@ -11,6 +11,7 @@ import HowToUse from './pages/HowToUse';
 import RegisteredUsers from './pages/RegisteredUsers';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import '@fortawesome/fontawesome-free/css/all.css';
+import { Link } from 'react-router-dom';
 
 function App() {
   const [currentPage, setCurrentPage] = useState('staff');
@@ -157,7 +158,7 @@ function App() {
             e.currentTarget.style.boxShadow = '0 8px 32px rgba(13, 110, 253, 0.2)';
           }}>
           <div className="container-fluid">
-            <a className="navbar-brand d-flex align-items-center" href="#" style={{
+            <Link className="navbar-brand d-flex align-items-center" to="/" style={{
               transition: 'all 0.3s ease',
               transform: 'translateY(0)'
             }}
@@ -185,7 +186,7 @@ function App() {
                   <span className="fw-bold">NIBM Campus</span>
                 </div>
               )}
-            </a>
+            </Link>
             
             <div className="d-flex align-items-center">
               <ul className="navbar-nav me-auto">

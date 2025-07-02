@@ -40,6 +40,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fixed Git merge conflict markers in package.json that were causing JSON parsing errors
 - Resolved npm install issues caused by invalid JSON structure
 - Fixed jsPDF-AutoTable import/usage for PDF download in Registered Users tab
+- Fixed React Router runtime error by wrapping the app in <BrowserRouter> in index.js, enabling safe use of <Link> and router components
 
 ### Technical Details
 - Server runs on development mode with nodemon for auto-restart
