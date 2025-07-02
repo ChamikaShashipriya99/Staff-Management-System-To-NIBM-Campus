@@ -23,6 +23,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Tips and best practices for using the system effectively
 - Registered Users tab: searchable table of lecturers, CSV and PDF download options
 - Backend endpoint `/api/auth/lecturers` to fetch all registered lecturers
+- 3D animated background added to Lecturer Login page for visual consistency
+- **Dark mode support instructions:** global dark mode state, toggle button, dark mode CSS, and optional persistence (see chat for implementation details)
 
 ### Changed
 - Updated root package.json to include project metadata and concurrent execution scripts

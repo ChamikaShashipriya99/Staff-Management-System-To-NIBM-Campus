@@ -85,9 +85,69 @@ const LecturerLogin = ({ onLogin, onShowRegister, onShowAdminLogin }) => {
         overflow: 'hidden'
       }}
     >
-      {/* Animated background elements (copied from Login.js) */}
+      {/* 3D Animated background elements */}
       <div className="position-absolute w-100 h-100" style={{ zIndex: 0 }}>
-        {/* ... (copy the animated background elements from Login.js) ... */}
+        <div className="position-absolute" style={{
+          top: '10%', left: '10%', width: '300px', height: '300px', borderRadius: '50%', background: 'rgba(255, 255, 255, 0.1)', animation: 'float 6s ease-in-out infinite'
+        }}></div>
+        <div className="position-absolute" style={{
+          bottom: '10%', right: '10%', width: '200px', height: '200px', borderRadius: '50%', background: 'rgba(255, 255, 255, 0.1)', animation: 'float 8s ease-in-out infinite'
+        }}></div>
+        <div className="position-absolute" style={{
+          top: '20%', right: '15%', width: '150px', height: '150px', background: 'rgba(255, 255, 255, 0.05)', transform: 'rotate(45deg)', animation: 'rotate 20s linear infinite'
+        }}></div>
+        <div className="position-absolute" style={{
+          bottom: '20%', left: '15%', width: '100px', height: '100px', background: 'rgba(255, 255, 255, 0.05)', transform: 'rotate(45deg)', animation: 'rotate 15s linear infinite reverse'
+        }}></div>
+        <div className="position-absolute" style={{
+          top: '30%', left: '30%', width: '200px', height: '2px', background: 'rgba(255, 255, 255, 0.1)', animation: 'slideRight 8s ease-in-out infinite'
+        }}></div>
+        <div className="position-absolute" style={{
+          bottom: '30%', right: '30%', width: '200px', height: '2px', background: 'rgba(255, 255, 255, 0.1)', animation: 'slideLeft 8s ease-in-out infinite'
+        }}></div>
+        <div className="position-absolute" style={{
+          top: '40%', left: '40%', width: '10px', height: '10px', borderRadius: '50%', background: 'rgba(255, 255, 255, 0.2)', animation: 'moveDot 10s ease-in-out infinite'
+        }}></div>
+        <div className="position-absolute" style={{
+          top: '60%', right: '40%', width: '8px', height: '8px', borderRadius: '50%', background: 'rgba(255, 255, 255, 0.2)', animation: 'moveDot 12s ease-in-out infinite reverse'
+        }}></div>
+        <div className="position-absolute w-100" style={{
+          bottom: '0', height: '100px', background: 'linear-gradient(180deg, transparent, rgba(255, 255, 255, 0.1))', animation: 'wave 8s ease-in-out infinite'
+        }}></div>
+        <div className="position-absolute" style={{
+          top: '15%', right: '25%', width: '50px', height: '50px', borderRadius: '50%', background: 'radial-gradient(circle, rgba(255,255,255,0.2) 0%, rgba(255,255,255,0) 70%)', animation: 'glow 4s ease-in-out infinite'
+        }}></div>
+        <div className="position-absolute" style={{
+          bottom: '25%', left: '20%', width: '40px', height: '40px', borderRadius: '50%', background: 'radial-gradient(circle, rgba(255,255,255,0.2) 0%, rgba(255,255,255,0) 70%)', animation: 'glow 5s ease-in-out infinite reverse'
+        }}></div>
+        {[...Array(20)].map((_, i) => (
+          <div
+            key={i}
+            className="position-absolute"
+            style={{
+              width: `${Math.random() * 4 + 2}px`,
+              height: `${Math.random() * 4 + 2}px`,
+              background: 'rgba(255, 255, 255, 0.3)',
+              borderRadius: '50%',
+              top: `${Math.random() * 100}%`,
+              left: `${Math.random() * 100}%`,
+              animation: `particle ${Math.random() * 10 + 5}s linear infinite`,
+              animationDelay: `${Math.random() * 5}s`
+            }}
+          />
+        ))}
+        <div className="position-absolute" style={{
+          top: '45%', right: '35%', width: '0', height: '0', borderLeft: '20px solid transparent', borderRight: '20px solid transparent', borderBottom: '35px solid rgba(255, 255, 255, 0.1)', animation: 'rotate3D 15s linear infinite'
+        }}></div>
+        <div className="position-absolute" style={{
+          bottom: '35%', left: '35%', width: '0', height: '0', borderLeft: '15px solid transparent', borderRight: '15px solid transparent', borderBottom: '25px solid rgba(255, 255, 255, 0.1)', animation: 'rotate3D 12s linear infinite reverse'
+        }}></div>
+        <div className="position-absolute" style={{
+          top: '50%', left: '50%', transform: 'translate(-50%, -50%)', width: '300px', height: '300px', border: '2px solid rgba(255, 255, 255, 0.1)', borderRadius: '50%', animation: 'expand 8s ease-in-out infinite'
+        }}></div>
+        <div className="position-absolute" style={{
+          top: '50%', left: '50%', transform: 'translate(-50%, -50%)', width: '200px', height: '200px', border: '2px solid rgba(255, 255, 255, 0.1)', borderRadius: '50%', animation: 'expand 8s ease-in-out infinite 1s'
+        }}></div>
       </div>
       {/* Login Card */}
       <div 
@@ -199,6 +259,50 @@ const LecturerLogin = ({ onLogin, onShowRegister, onShowAdminLogin }) => {
           </div>
         </div>
       </div>
+      <style>{`
+        @keyframes float {
+          0%, 100% { transform: translateY(0); }
+          50% { transform: translateY(-20px); }
+        }
+        @keyframes rotate {
+          0% { transform: rotate(0deg); }
+          100% { transform: rotate(360deg); }
+        }
+        @keyframes slideRight {
+          0%, 100% { left: 30%; }
+          50% { left: 60%; }
+        }
+        @keyframes slideLeft {
+          0%, 100% { right: 30%; }
+          50% { right: 60%; }
+        }
+        @keyframes moveDot {
+          0%, 100% { transform: scale(1); }
+          50% { transform: scale(1.5); }
+        }
+        @keyframes wave {
+          0%, 100% { height: 100px; }
+          50% { height: 120px; }
+        }
+        @keyframes glow {
+          0%, 100% { opacity: 0.7; }
+          50% { opacity: 1; }
+        }
+        @keyframes particle {
+          0% { opacity: 0; }
+          10% { opacity: 1; }
+          90% { opacity: 1; }
+          100% { opacity: 0; }
+        }
+        @keyframes rotate3D {
+          0% { transform: rotateY(0deg); }
+          100% { transform: rotateY(360deg); }
+        }
+        @keyframes expand {
+          0%, 100% { transform: translate(-50%, -50%) scale(1); }
+          50% { transform: translate(-50%, -50%) scale(1.1); }
+        }
+      `}</style>
     </div>
   );
 };
