@@ -69,31 +69,28 @@ const Register = ({ onRegister, onShowLogin }) => {
           overflow: 'hidden'
         }}
       >
-        {/* Success Animation Container */}
-        <div className="text-center" style={{ position: 'relative', zIndex: 2 }}>
-          <div className="success-animation">
-            <div className="success-checkmark">
-              <div className="check-icon">
-                <span className="icon-line line-tip"></span>
-                <span className="icon-line line-long"></span>
-                <div className="icon-circle"></div>
-                <div className="icon-fix"></div>
-              </div>
-            </div>
-            <div className="success-rings">
-              <div className="ring ring-1"></div>
-              <div className="ring ring-2"></div>
-              <div className="ring ring-3"></div>
-            </div>
-            <div className="success-particles">
-              {[...Array(12)].map((_, i) => (
-                <div key={i} className="particle" style={{ '--i': i }}></div>
-              ))}
+        <div className="success-animation">
+          <div className="success-checkmark">
+            <div className="check-icon">
+              <span className="icon-line line-tip"></span>
+              <span className="icon-line line-long"></span>
+              <div className="icon-circle"></div>
+              <div className="icon-fix"></div>
             </div>
           </div>
-          <h3 className="text-white mt-4 mb-2 success-title">Registration Successful!</h3>
-          <p className="text-white-50 success-subtitle">Redirecting to login...</p>
+          <div className="success-rings">
+            <div className="ring ring-1"></div>
+            <div className="ring ring-2"></div>
+            <div className="ring ring-3"></div>
+          </div>
+          <div className="success-particles">
+            {[...Array(12)].map((_, i) => (
+              <div key={i} className="particle" style={{ '--i': i }}></div>
+            ))}
+          </div>
         </div>
+        <h3 className="text-white mt-4 mb-2 success-title">Registration Successful!</h3>
+        <p className="text-white-50 success-subtitle">Redirecting to login...</p>
         <style>{`/* Success animation styles copied from Login.js */`}</style>
       </div>
     );
@@ -108,7 +105,7 @@ const Register = ({ onRegister, onShowLogin }) => {
         overflow: 'hidden'
       }}
     >
-      {/* Animated background elements (copied from Login.js) */}
+      {/* Animated background elements */}
       <div className="position-absolute w-100 h-100" style={{ zIndex: 0 }}>
         <div className="position-absolute" style={{
           top: '10%', left: '10%', width: '300px', height: '300px', borderRadius: '50%', background: 'rgba(255, 255, 255, 0.1)', animation: 'float 6s ease-in-out infinite'
@@ -172,6 +169,7 @@ const Register = ({ onRegister, onShowLogin }) => {
           top: '50%', left: '50%', transform: 'translate(-50%, -50%)', width: '200px', height: '200px', border: '2px solid rgba(255, 255, 255, 0.1)', borderRadius: '50%', animation: 'expand 8s ease-in-out infinite 1s'
         }}></div>
       </div>
+      
       {/* Registration Card */}
       <div className="card shadow p-4" style={{ minWidth: 350, maxWidth: 400, borderRadius: 20, position: 'relative', zIndex: 1 }}>
         <div className="text-center mb-4">

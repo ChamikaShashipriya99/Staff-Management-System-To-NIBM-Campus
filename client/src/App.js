@@ -7,6 +7,7 @@ import StaffList from './pages/StaffList';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import LecturerLogin from './pages/LecturerLogin';
+import HowToUse from './pages/HowToUse';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import '@fortawesome/fontawesome-free/css/all.css';
 
@@ -101,6 +102,8 @@ function App() {
             isLoading={isLoading}
           />
         );
+      case 'howToUse':
+        return <HowToUse />;
       default:
         return (
           <StaffList 
@@ -233,6 +236,32 @@ function App() {
                   >
                     <i className="fas fa-users me-2"></i>
                     Staff
+                  </button>
+                </li>
+                <li className="nav-item">
+                  <button 
+                    className={`nav-link btn btn-link ${currentPage === 'howToUse' ? 'active' : ''}`} 
+                    onClick={() => setCurrentPage('howToUse')}
+                    style={{ 
+                      textDecoration: 'none',
+                      color: 'rgba(255, 255, 255, 0.9)',
+                      transition: 'all 0.3s ease',
+                      position: 'relative',
+                      padding: '8px 16px',
+                      borderRadius: '10px',
+                      margin: '0 5px'
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.color = '#ffffff';
+                      e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.1)';
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.color = 'rgba(255, 255, 255, 0.9)';
+                      e.currentTarget.style.backgroundColor = 'transparent';
+                    }}
+                  >
+                    <i className="fas fa-question-circle me-2"></i>
+                    How to Use
                   </button>
                 </li>
               </ul>
