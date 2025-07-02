@@ -132,7 +132,7 @@ const AddStaff = ({ onSuccess }) => {
 
       console.log('Submitting staff data:', staffData);
 
-      const response = await axios.post('http://localhost:5000/api/staff', staffData);
+      const response = await axios.post(`${process.env.REACT_APP_API_URL}/api/staff`, staffData);
       
       if (response.status === 201) {
         alert('Staff member added successfully!');

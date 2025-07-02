@@ -1,4 +1,4 @@
-const mongoose = require('mongoose');
+import mongoose from 'mongoose';
 
 const lecturerSchema = new mongoose.Schema({
   name: {
@@ -23,4 +23,5 @@ const lecturerSchema = new mongoose.Schema({
   timestamps: true
 });
 
-module.exports = mongoose.model('Lecturer', lecturerSchema); 
+const Lecturer = mongoose.models.Lecturer || mongoose.model('Lecturer', lecturerSchema);
+export default Lecturer; 

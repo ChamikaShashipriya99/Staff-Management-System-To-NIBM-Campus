@@ -9,7 +9,7 @@ const RegisteredUsers = () => {
 
   useEffect(() => {
     // TODO: Adjust endpoint if needed
-    axios.get('http://localhost:5000/api/auth/lecturers')
+    axios.get(`${process.env.REACT_APP_API_URL}/api/auth?lecturers`)
       .then(res => setUsers(res.data))
       .catch(() => setUsers([]));
   }, []);

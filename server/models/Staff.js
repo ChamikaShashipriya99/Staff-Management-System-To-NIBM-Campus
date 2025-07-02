@@ -1,4 +1,4 @@
-const mongoose = require('mongoose');
+import mongoose from 'mongoose';
 
 // Schema for academic activities
 const activitySchema = new mongoose.Schema({
@@ -73,4 +73,5 @@ const staffSchema = new mongoose.Schema({
   timestamps: true
 });
 
-module.exports = mongoose.model('Staff', staffSchema); 
+const Staff = mongoose.models.Staff || mongoose.model('Staff', staffSchema);
+export default Staff; 
