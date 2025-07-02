@@ -37,7 +37,7 @@ const StaffList = ({ onAddStaff, staffData, onStaffUpdate, isLoading }) => {
   const handleDelete = async (staffId) => {
     if (window.confirm('Are you sure you want to delete this staff member?')) {
       try {
-        await axios.delete(`${process.env.REACT_APP_API_URL}/api/staff?id=${staffId}`);
+        await axios.delete(`${process.env.REACT_APP_API_URL}/api/staff/${staffId}`);
         onStaffUpdate(); // Call the parent's update function
         toast.success('Staff member deleted successfully');
       } catch (error) {
@@ -96,7 +96,7 @@ const StaffList = ({ onAddStaff, staffData, onStaffUpdate, isLoading }) => {
         })
       };
 
-      await axios.put(`${process.env.REACT_APP_API_URL}/api/staff?id=${selectedStaff._id}`, updatedData);
+      await axios.put(`${process.env.REACT_APP_API_URL}/api/staff/${selectedStaff._id}`, updatedData);
       setShowEditModal(false);
       onStaffUpdate(); // Call the parent's update function
       toast.success('Staff member updated successfully');

@@ -22,7 +22,7 @@ const LecturerLogin = ({ onLogin, onShowRegister, onShowAdminLogin }) => {
     e.preventDefault();
     setIsLoading(true);
     try {
-      const response = await axios.post(`${process.env.REACT_APP_API_URL}/api/auth?lecturer/login`, formData);
+      const response = await axios.post(`${process.env.REACT_APP_API_URL}/api/auth/lecturer/login`, formData);
       if (response.data.success) {
         setIsLoginSuccess(true);
         setTimeout(() => {
