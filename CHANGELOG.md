@@ -21,6 +21,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Step-by-step instructions for all application features
 - Interactive accordion sections for detailed feature explanations
 - Tips and best practices for using the system effectively
+- Registered Users tab: searchable table of lecturers, CSV and PDF download options
+- Backend endpoint `/api/auth/lecturers` to fetch all registered lecturers
 
 ### Changed
 - Updated root package.json to include project metadata and concurrent execution scripts
@@ -35,6 +37,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Resolved React component structure issues in registration form
 - Fixed Git merge conflict markers in package.json that were causing JSON parsing errors
 - Resolved npm install issues caused by invalid JSON structure
+- Fixed jsPDF-AutoTable import/usage for PDF download in Registered Users tab
 
 ### Technical Details
 - Server runs on development mode with nodemon for auto-restart
@@ -42,6 +45,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Both processes run in parallel using concurrently package
 - All dependencies installed for root, server, and client projects
 - Registration form now properly connects to `/api/auth/lecturer/register` endpoint
+- Registered Users page fetches data from `/api/auth/lecturers` and supports CSV/PDF export
 
 ---
 
