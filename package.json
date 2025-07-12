@@ -1,0 +1,21 @@
+{
+  "name": "staff-management-system",
+  "version": "1.0.0",
+  "description": "Staff Management System for NIBM Campus",
+  "main": "index.js",
+  "scripts": {
+    "dev": "concurrently \"npm run server:dev\" \"npm run client:start\"",
+    "start": "concurrently \"npm run server:start\" \"npm run client:start\"",
+    "server:dev": "cd server && npm run dev",
+    "server:start": "cd server && npm start",
+    "client:start": "cd client && npm start",
+    "client:build": "cd client && npm run build",
+    "install:all": "npm install && cd server && npm install && cd ../client && npm install"
+  },
+  "dependencies": {
+    "bootstrap": "^5.3.6"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  }
+}
